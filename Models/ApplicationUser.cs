@@ -4,6 +4,6 @@ namespace Blog_Zaliczeniowy.Models
 {
 	public class ApplicationUser : IdentityUser
 	{
-		public string FullName { get; set; }
+		public string Nickname { get; set; }
 	}
 }

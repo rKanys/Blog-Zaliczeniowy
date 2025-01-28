@@ -12,6 +12,7 @@ using System.Security.Claims;
 using Blog_Zaliczeniowy.Models.DTO.PostDTO;
 using System.Collections.Immutable;
 using Humanizer;
+using Microsoft.Extensions.Hosting;
 
 namespace Blog_Zaliczeniowy.Controllers
 {
@@ -58,7 +59,8 @@ namespace Blog_Zaliczeniowy.Controllers
 		// GET: Posts/Create
 		public IActionResult Create()
 		{
-			ViewBag.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			//ViewBag.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			ViewData["UserId"] = new SelectList(_context.Users, "Id", "Nickname", User.FindFirstValue(ClaimTypes.NameIdentifier));
 			return View();
 		}
 
@@ -115,7 +117,7 @@ namespace Blog_Zaliczeniowy.Controllers
             {
                 return NotFound();
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", post.UserId);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Nickname", post.UserId);
             return View(post);
         }
 
@@ -198,7 +200,7 @@ namespace Blog_Zaliczeniowy.Controllers
 					throw;
 				}
 			}
-			ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", post.UserId);
+			ViewData["UserId"] = new SelectList(_context.Users, "Id", "Nickname", post.UserId);
 			return RedirectToAction(nameof(Index));
 		}
 

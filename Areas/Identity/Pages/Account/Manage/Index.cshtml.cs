@@ -30,6 +30,8 @@ namespace Blog_Zaliczeniowy.Areas.Identity.Pages.Account.Manage
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
+        /// 
+        [Display(Name = "Adres e-mail")]
         public string Username { get; set; }
 
         /// <summary>
@@ -56,8 +58,13 @@ namespace Blog_Zaliczeniowy.Areas.Identity.Pages.Account.Manage
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Phone]
-            [Display(Name = "Phone number")]
+            /// 
+            [Display(Name = "Nazwa u¿ytkownika")]
+			[StringLength(50, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
+			public string Nickname { get; set; }
+
+			[Phone]
+            [Display(Name = "Numer telefonu")]
             public string PhoneNumber { get; set; }
         }
 
@@ -70,7 +77,8 @@ namespace Blog_Zaliczeniowy.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                Nickname = user.Nickname
             };
         }
 
@@ -100,7 +108,24 @@ namespace Blog_Zaliczeniowy.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+			if (Input.Nickname != user.Nickname)
+			{
+				user.Nickname = Input.Nickname;
+			}
+
+			var updateResult = await _userManager.UpdateAsync(user);
+			if (!updateResult.Succeeded)
+			{
+				foreach (var error in updateResult.Errors)
+				{
+					ModelState.AddModelError(string.Empty, error.Description);
+				}
+				// Jeszcze raz poka¿ stronê z b³êdami
+				await OnGetAsync();
+				return Page();
+			}
+
+			var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             if (Input.PhoneNumber != phoneNumber)
             {
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
