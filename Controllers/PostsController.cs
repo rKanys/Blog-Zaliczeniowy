@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Blog_Zaliczeniowy.Models.DTO.PostDTO;
 using System.Collections.Immutable;
+using Humanizer;
 
 namespace Blog_Zaliczeniowy.Controllers
 {
@@ -71,7 +72,7 @@ namespace Blog_Zaliczeniowy.Controllers
 			if (ModelState.IsValid)
 			{
 				// Pobierz użytkownika zalogowanego
-				var user = await _userManager.GetUserAsync(User);  // Użyj UserManagera, aby uzyskać pełne dane użytkownika
+				var user = await _userManager.GetUserAsync(User);
 
 				if (user != null)
 				{
@@ -161,36 +162,45 @@ namespace Blog_Zaliczeniowy.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Content,CreatedAt,UserId")] Post post)
+        public async Task<IActionResult> Edit(int id, PostDTO postDTO)
         {
-            if (id != post.Id)
-            {
-                return NotFound();
-            }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(post);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PostExists(post.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", post.UserId);
-            return View(post);
-        }
+			if (!ModelState.IsValid)
+			{
+				return View(postDTO);
+			}
+			var post = await _context.Posts
+				.Include(p => p.User)
+				.FirstOrDefaultAsync(p => p.Id == id);
+
+			if (post == null)
+			{
+				return NotFound();
+			}
+
+			post.Title = postDTO.Title;
+			post.Content = postDTO.Content;
+
+
+			try
+			{
+				_context.Update(post);
+				await _context.SaveChangesAsync();
+			}
+			catch (DbUpdateConcurrencyException)
+			{
+				if (!PostExists(post.Id))
+				{
+					return NotFound();
+				}
+				else
+				{
+					throw;
+				}
+			}
+			ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", post.UserId);
+			return RedirectToAction(nameof(Index));
+		}
 
         // GET: Posts/Delete/5
         public async Task<IActionResult> Delete(int? id)

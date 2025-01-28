@@ -7,7 +7,7 @@ namespace Blog_Zaliczeniowy
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -18,13 +18,15 @@ namespace Blog_Zaliczeniowy
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 			builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
-	            .AddEntityFrameworkStores<ApplicationDbContext>();
+				.AddRoles<IdentityRole>()
+				.AddEntityFrameworkStores<ApplicationDbContext>();
 			builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+
+			// Configure the HTTP request pipeline.
+			if (app.Environment.IsDevelopment())
             {
                 app.UseMigrationsEndPoint();
             }
@@ -40,14 +42,57 @@ namespace Blog_Zaliczeniowy
 
             app.UseRouting();
 
-            app.UseAuthorization();
+			app.UseAuthentication();
+			app.UseAuthorization();
 
-            app.MapControllerRoute(
+			app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=posts}/{action=Index}/{id?}");
             app.MapRazorPages();
 
-            app.Run();
+			using (var scope = app.Services.CreateScope())
+			{
+				var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+				var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+				var roles = new[] { "Administrator", "User" };
+
+				foreach (var role in roles)
+				{
+					if (!await roleManager.RoleExistsAsync(role))
+						await roleManager.CreateAsync(new IdentityRole(role));
+				}
+
+				var adminEmail = "admin@admin.com";
+				var adminPassword = "Admin123#";
+
+				if (await userManager.FindByEmailAsync(adminEmail) == null)
+				{
+					var adminUser = new ApplicationUser
+					{
+						UserName = adminEmail,
+						Email = adminEmail,
+						EmailConfirmed = true
+					};
+
+					var result = await userManager.CreateAsync(adminUser, adminPassword);
+					if (result.Succeeded)
+					{
+						await userManager.AddToRoleAsync(adminUser, "Administrator");
+					}
+					else
+					{
+						var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+						foreach (var error in result.Errors)
+						{
+							logger.LogError($"Nie uda³o siê utworzyæ konta: {error.Description}");
+						}
+					}
+				}
+			}
+
+
+			app.Run();
         }
     }
 }
