@@ -1,0 +1,29 @@
+﻿@model Blog_Zaliczeniowy.Models.Post
+
+<h2>@Model.Title</h2>
+<p>@Model.Content</p>
+<p><strong>Posted by:</strong> @Model.User.UserName</p>
+<p><strong>Created at:</strong> @Model.CreatedAt.ToString("MMMM dd, yyyy")</p>
+
+<hr />
+
+<h3>Comments</h3>
+
+<!-- Wyświetlanie istniejących komentarzy -->
+@foreach (var comment in Model.Comments)
+{
+    <div class="comment">
+        <p><strong>@comment.User.UserName</strong> said:</p>
+        <p>@comment.Content</p>
+        <p><small>Posted on @comment.CreatedAt.ToString("MMMM dd, yyyy HH:mm")</small></p>
+    </div>
+}
+
+<!-- Formularz do dodawania nowego komentarza -->
+<h4>Add a Comment:</h4>
+<form asp-action="AddComment" asp-route-postId="@Model.Id" method="post">
+    <div class="form-group">
+        <textarea name="commentContent" rows="4" class="form-control" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Comment</button>
+</form>
