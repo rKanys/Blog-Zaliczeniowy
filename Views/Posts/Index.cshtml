@@ -73,32 +73,46 @@
 	}
 
 	<!-- PAGINACJA (prosty szablon; zaimplementuj w kontrolerze) -->
-	
 	@{
-	int currentPage = ViewBag.CurrentPage ?? 1;
-	int totalPages  = ViewBag.TotalPages  ?? 10;
-	int range = 4;
+		int currentPage = ViewBag.CurrentPage ?? 1;
+		int totalPages = ViewBag.TotalPages ?? 1;
+		int range = 3;
 
-	Func<int> handleLimits = () => Math.Min(Math.Max(1, totalPages - 2 * range), Math.Max(1, currentPage - range));
+		Func<int> handleLimits = () => Math.Min(Math.Max(1, totalPages - 2 * range), Math.Max(1, currentPage - range));
 
-	IList<int> pages = Enumerable
+		IList<int> pages = Enumerable
 		.Range(handleLimits(), range * 2 + 1)
 		.TakeWhile(p => p <= totalPages)
 		.ToList();
-		}
+	}
 	<div class="MyPagination">
-		
-		<a asp-action="Index" asp-route-pageNumber="1">Pierwsza</a>
-		<a asp-action="Index" asp-route-pageNumber="@(currentPage - 1)" class="@(currentPage == 1 ? "disabled" : "")">Poprzednia</a>
 
-		@foreach(int page in pages)
+		<a asp-action="Index" asp-route-strona="1">Pierwsza</a>
+		@if (currentPage <= 1)
 		{
-			<a asp-action="Index" asp-route-pageNumber="@(page)" class="@(page == currentPage ? "active" : "")">@(page)</a>
+
+			<a asp-action="Index" id="lastPage" asp-route-strona="@(currentPage)">Poprzednia</a>
+		}
+		else
+		{
+			<a asp-action="Index" id="lastPage" asp-route-strona="@(currentPage - 1)">Poprzednia</a>
+		}
+		@foreach (int page in pages)
+		{
+			<a asp-action="Index" asp-route-strona="@(page)" class="@(page == currentPage ? "active" : "")">@(page)</a>
 		}
 
-		<a asp-action="Index" asp-route-pageNumber="@(currentPage + 1)" class="@(currentPage == totalPages ? "disabled" : "")">Następna</a>
-		<a asp-action="Index" asp-route-pageNumber="@totalPages">Ostatnia</a>
+		@if (currentPage == totalPages)
+		{
+
+			<a asp-action="Index" id="lastPage" asp-route-strona="@(currentPage)">Następna</a>
+		}
+		else
+		{
+			<a asp-action="Index" id="lastPage" asp-route-strona="@(currentPage + 1)">Następna</a>
+		}
+		<a asp-action="Index" asp-route-strona="@totalPages">Ostatnia</a>
 
 	</div>
-
+	@* @class="@(currentPage == totalPages ? "disabled" : "") *@
 </div>

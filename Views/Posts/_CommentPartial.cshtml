@@ -9,7 +9,6 @@
 		foreach (var reply in Model.Replies)
 		{
 			<partial name="_CommentPartial.cshtml" for="@reply" />
-			@* @Html.Partial("_CommentPartial", reply) *@
 		}
 	}
 	@if (Model.ParentCommentId == null)

@@ -29,14 +29,23 @@ namespace Blog_Zaliczeniowy.Controllers
 		}
 
 		// GET: Posts
-		public async Task<IActionResult> Index()
+		public async Task<IActionResult> Index(int strona = 1)
 		{
 			var posts = await _context.Posts
 				.Include(p => p.User)
 				.Where(v => v.Visibility == true)
 				.ToListAsync();
+			posts.Reverse();
+			int perStrona = 5;
+			int amountToSkip = strona * perStrona - perStrona;
+			int toSkip = (amountToSkip < posts.Count() ? amountToSkip: (posts.Count() / perStrona) * perStrona);
+			if (toSkip == posts.Count()) toSkip -= 1;
+			int countPerStrona = posts.Count() / perStrona;
+			ViewBag.TotalPages = (posts.Count() % perStrona == 0 ? countPerStrona : countPerStrona + 1);
+			var newPosts = posts.Skip(toSkip).Take(perStrona);
 
-			return View(posts);
+			ViewBag.CurrentPage = (strona <= ViewBag.TotalPages ? strona : ViewBag.TotalPages); 
+			return View(newPosts);
 		}
 
 		// GET: Posts/Details/5
