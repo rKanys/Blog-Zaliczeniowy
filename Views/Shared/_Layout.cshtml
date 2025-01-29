@@ -7,6 +7,139 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Blog_Zaliczeniowy.styles.css" asp-append-version="true" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .blog-container {
+            width: 95%;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 15px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .post-card {
+            background: #fff;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+            padding: 20px;
+        }
+
+        .post-title {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+            .post-title:hover {
+                text-decoration: underline;
+            }
+
+        .post-meta {
+            font-size: 0.9rem;
+            color: #777;
+            margin-bottom: 12px;
+        }
+
+        .post-content {
+            font-size: 1rem;
+            line-height: 1.6;
+            position: relative;
+            color: #444;
+        }
+
+        /* Fade-out efekt przy ucięciu */
+        .content-fade {
+            max-height: 140px;
+            overflow: hidden;
+            position: relative;
+        }
+
+            .content-fade::after {
+                content: "";
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 50px;
+                background: linear-gradient(rgba(255,255,255,0), #fff 80%);
+            }
+
+        .read-more {
+            display: inline-block;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+            .read-more:hover {
+                text-decoration: underline;
+            }
+
+        .action-btn {
+            display: inline-block;
+            background: #007bff;
+            color: #fff;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            margin-right: 6px;
+            font-size: 0.9rem;
+        }
+
+            .action-btn:hover {
+                background: #0056b3;
+            }
+
+        .action-delete {
+            background: #dc3545;
+        }
+
+            .action-delete:hover {
+                background: #c82333;
+            }
+
+        /* Paginacja */
+        .MyPagination {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+            .MyPagination a {
+                display: inline-block;
+                margin: 0 5px;
+                padding: 8px 12px;
+                color: #007bff;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                text-decoration: none;
+            }
+
+                .MyPagination a:hover {
+                    background: #eee;
+                }
+
+            .MyPagination .active {
+                background: #007bff;
+                color: #fff;
+                border-color: #007bff;
+            }
+    </style>
 </head>
 <body>
     <header>
@@ -21,9 +154,9 @@
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="posts" asp-action="Index">Strona Główna</a>
-                        </li>
+                        </li
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="posts" asp-action="WaitRoom">Poczekalnia</a>
                         </li>
                         @if (User.IsInRole("Administrator"))
                         {
@@ -45,7 +178,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - Blog_Zaliczeniowy - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2025 - Blog_Zaliczeniowy - <a asp-area="" asp-controller="Posts" asp-action="Index"></a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

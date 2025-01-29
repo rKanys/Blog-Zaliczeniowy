@@ -13,6 +13,7 @@ using Blog_Zaliczeniowy.Models.DTO.PostDTO;
 using System.Collections.Immutable;
 using Humanizer;
 using Microsoft.Extensions.Hosting;
+using System.Diagnostics;
 
 namespace Blog_Zaliczeniowy.Controllers
 {
@@ -252,6 +253,11 @@ namespace Blog_Zaliczeniowy.Controllers
 			}
 
 			return RedirectToAction(nameof(Index));
+		}
+		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+		public IActionResult Error()
+		{
+			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 		}
 
 		private bool PostExists(int id)
