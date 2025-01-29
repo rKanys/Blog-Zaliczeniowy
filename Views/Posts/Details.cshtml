@@ -18,7 +18,13 @@
 <h4>Zostaw komentarz:</h4>
 <form asp-action="AddComment" asp-route-postId="@Model.Id" method="post">
     <div class="form-group">
-        <textarea name="commentContent" rows="4" class="form-control" required></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Wyślij</button>
+        
+        @if (!User.Identity.IsAuthenticated){
+            <textarea name="commentContent" rows="4" class="form-control" required placeholder="Zaloguj się, aby skomentować" disabled></textarea>
+            @:</div>
+        } else {
+            <textarea name="commentContent" rows="4" class="form-control" required placeholder="Napisz komentarz"></textarea>
+            @:</div>
+            <button type="submit" class="btn btn-primary">Wyślij</button>
+        }
 </form>

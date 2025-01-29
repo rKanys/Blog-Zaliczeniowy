@@ -1,0 +1,19 @@
+﻿@model EditUserViewModel
+
+<h2>Edycja użytkownika</h2>
+
+<form asp-action="EditUser">
+    <input type="hidden" asp-for="UserId" />
+
+    <div>
+        <label asp-for="Nickname"></label>
+        <input asp-for="Nickname" />
+    </div>
+    <div>
+        <label asp-for="Email"></label>
+        <input asp-for="Email" />
+    </div>
+    <!-- Rola i inne pola w razie potrzeby -->
+
+    <button type="submit">Zapisz</button>
+</form>

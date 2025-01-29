@@ -72,7 +72,8 @@ namespace Blog_Zaliczeniowy
 					{
 						UserName = adminEmail,
 						Email = adminEmail,
-						EmailConfirmed = true
+						EmailConfirmed = true,
+						Nickname = "Admin"
 					};
 
 					var result = await userManager.CreateAsync(adminUser, adminPassword);

@@ -1,0 +1,28 @@
+﻿@model IEnumerable<Blog_Zaliczeniowy.Models.Comment>
+
+<h2>Komentarze</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Autor</th>
+            <th>Treść</th>
+            <th>Post</th>
+            <th>Data</th>
+            <th>Akcje</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var comment in Model)
+        {
+            <tr>
+                <td>@comment.User?.Nickname</td>
+                <td>@comment.Content</td>
+                <td>@comment.Post?.Title</td>
+                <td>@comment.CreatedAt</td>
+                <td>
+                    <a asp-action="DeleteComment" asp-route-id="@comment.Id">Usuń</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

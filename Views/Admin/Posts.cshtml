@@ -1,0 +1,44 @@
+﻿@model IEnumerable<Blog_Zaliczeniowy.Models.Post>
+
+<h2>Zarządzanie postami</h2>
+<table class="table">
+	<thead>
+		<tr>
+			<th>Widoczność</th>
+			<th>Tytuł</th>
+			<th>Autor</th>
+			<th>Data</th>
+			<th>Akcje</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var post in Model)
+		{
+			<tr>
+				<td>
+					@if (post.Visibility)
+					{
+						@:1
+					}
+					else
+					{
+						@:0
+					}
+				<td>@post.Title</td>
+				<td>@post.User?.Nickname</td>
+				<td>@post.CreatedAt</td>
+				<td>
+					<a asp-action="EditPost" asp-route-id="@post.Id">Edytuj</a> |
+						@if (!post.Visibility)
+						{
+							<a asp-action="RestorePost" asp-route-id="@post.Id">Przywróć</a>
+						}
+						else
+						{
+						<a asp-action="DeletePost" asp-route-id="@post.Id">Usuń</a>
+						}
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>

@@ -22,5 +22,7 @@ namespace Blog_Zaliczeniowy.Models
 
 		// Kolekcja podrzędnych komentarzy (dzieci), czyli odpowiedzi
 		public virtual ICollection<Comment> Replies { get; set; } = new List<Comment>();
+
+		public bool Visibility { get; set; } = true;
 	}
 }

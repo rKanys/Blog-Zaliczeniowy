@@ -14,13 +14,14 @@
 	}
 	@if (Model.ParentCommentId == null)
 	{
+		@if (User.Identity.IsAuthenticated){
 		<form method="post" asp-action="AddComment">
 			<input type="hidden" name="postId" value="@Model.PostId" />
 			<input type="hidden" name="parentCommentId" value="@Model.Id" />
-
 			<textarea name="commentContent"></textarea>
 			<button type="submit">Odpowiedz</button>
 		</form>
+		}
 	}
 	<p></p>
 </div>

@@ -16,8 +16,8 @@ using Microsoft.Extensions.Hosting;
 
 namespace Blog_Zaliczeniowy.Controllers
 {
-    public class PostsController : Controller
-    {
+	public class PostsController : Controller
+	{
 		private readonly ApplicationDbContext _context;
 		private readonly UserManager<ApplicationUser> _userManager;
 
@@ -30,7 +30,11 @@ namespace Blog_Zaliczeniowy.Controllers
 		// GET: Posts
 		public async Task<IActionResult> Index()
 		{
-			var posts = await _context.Posts.Include(p => p.User).ToListAsync();
+			var posts = await _context.Posts
+				.Include(p => p.User)
+				.Where(v => v.Visibility == true)
+				.ToListAsync();
+
 			return View(posts);
 		}
 
@@ -103,23 +107,23 @@ namespace Blog_Zaliczeniowy.Controllers
 
 		// GET: Posts/Edit/5
 		public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+		{
+			if (id == null)
+			{
+				return NotFound();
+			}
 
 			var post = await _context.Posts
 				//.FindAsync(id);
 				.Include(p => p.User)
 				.FirstOrDefaultAsync(m => m.Id == id);
-            if (post == null)
-            {
-                return NotFound();
-            }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Nickname", post.UserId);
-            return View(post);
-        }
+			if (post == null)
+			{
+				return NotFound();
+			}
+			ViewData["UserId"] = new SelectList(_context.Users, "Id", "Nickname", post.UserId);
+			return View(post);
+		}
 
 		// POST: Post/AddComment/5
 		[HttpPost]
@@ -170,9 +174,9 @@ namespace Blog_Zaliczeniowy.Controllers
 		// To protect from overposting attacks, enable the specific properties you want to bind to.
 		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
 		[HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, PostDTO postDTO)
-        {
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Edit(int id, PostDTO postDTO)
+		{
 
 			if (!ModelState.IsValid)
 			{
@@ -211,43 +215,48 @@ namespace Blog_Zaliczeniowy.Controllers
 			return RedirectToAction(nameof(Index));
 		}
 
-        // GET: Posts/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+		// GET: Posts/Delete/5
+		public async Task<IActionResult> Delete(int? id)
+		{
+			if (id == null)
+			{
+				return NotFound();
+			}
 
-            var post = await _context.Posts
-                .Include(p => p.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (post == null)
-            {
-                return NotFound();
-            }
+			var post = await _context.Posts
+				.Include(p => p.User)
+				.FirstOrDefaultAsync(m => m.Id == id);
+			if (post == null)
+			{
+				return NotFound();
+			}
 
-            return View(post);
-        }
+			return View(post);
+		}
 
-        // POST: Posts/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var post = await _context.Posts.FindAsync(id);
-            if (post != null)
-            {
-                _context.Posts.Remove(post);
-            }
+		// POST: Posts/Delete/5
+		[HttpPost, ActionName("Delete")]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> DeleteConfirmed(int id)
+		{
+			var post = await _context.Posts.FindAsync(id);
+			if (post != null)
+			{
+				var _user = _userManager.GetUserId(User);
+				if (post.UserId == _user)
+				{
+					post.Visibility = false;
+					_context.Posts.Update(post);
+					await _context.SaveChangesAsync();
+				}
+			}
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+			return RedirectToAction(nameof(Index));
+		}
 
-        private bool PostExists(int id)
-        {
-            return _context.Posts.Any(e => e.Id == id);
-        }
-    }
+		private bool PostExists(int id)
+		{
+			return _context.Posts.Any(e => e.Id == id);
+		}
+	}
 }

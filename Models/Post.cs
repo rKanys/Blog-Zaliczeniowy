@@ -9,5 +9,6 @@
 		public string UserId { get; set; }  // Relacja z użytkownikiem
 		public ApplicationUser User { get; set; }
 		public List<Comment> Comments { get; set; } = new List<Comment>();
+		public bool Visibility { get; set; } = true;
 	}
 }

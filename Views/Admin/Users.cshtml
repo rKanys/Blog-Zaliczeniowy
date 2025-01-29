@@ -1,0 +1,25 @@
+﻿@model IEnumerable<Blog_Zaliczeniowy.Models.ApplicationUser>
+
+<h2>Lista użytkowników</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nickname</th>
+            <th>Email</th>
+            <th>Akcje</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.Nickname</td>
+                <td>@user.Email</td>
+                <td>
+                    <a asp-action="EditUser" asp-route-id="@user.Id">Edytuj</a> |
+                    <a asp-action="DeleteUser" asp-route-id="@user.Id">Usuń</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
