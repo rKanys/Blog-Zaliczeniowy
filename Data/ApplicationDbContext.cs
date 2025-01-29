@@ -17,13 +17,21 @@ namespace Blog_Zaliczeniowy.Data
 			base.OnModelCreating(modelBuilder);
 
 			// Konfiguracja dla Post-Comment: w tym przypadku wyłączenie kaskady na usuwanie
-			modelBuilder.Entity<Comment>()
-				.HasOne(c => c.Post)
-				.WithMany(p => p.Comments)
-				.HasForeignKey(c => c.PostId)
-				.OnDelete(DeleteBehavior.Restrict);  // Można także użyć DeleteBehavior.SetNull
+			//modelBuilder.Entity<Comment>()
+			//	.HasOne(c => c.Post)
+			//	.WithMany(p => p.Comments)
+			//	.HasForeignKey(c => c.PostId)
+			//	.OnDelete(DeleteBehavior.Restrict);  // Można także użyć DeleteBehavior.SetNull
 
-			// Możesz dodać podobne konfiguracje dla innych relacji, jeśli je masz.
+
+			// Relacja jeden-do-wielu: jeden komentarz może mieć wiele odpowiedzi
+			modelBuilder.Entity<Comment>()
+				.HasOne(c => c.ParentComment)
+				.WithMany(c => c.Replies)
+				.HasForeignKey(c => c.ParentCommentId)
+				.OnDelete(DeleteBehavior.Restrict);
+			// lub Cascade, ale Restrict może być bezpieczniejsze, aby nie usuwać łańcuchowo wszystkich dzieci
 		}
+		// Możesz dodać podobne konfiguracje dla innych relacji, jeśli je masz.
 	}
 }

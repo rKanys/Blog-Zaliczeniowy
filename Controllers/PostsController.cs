@@ -124,7 +124,7 @@ namespace Blog_Zaliczeniowy.Controllers
 		// POST: Post/AddComment/5
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> AddComment(int postId, string commentContent)
+		public async Task<IActionResult> AddComment(int postId, string commentContent, int? parentCommentId)
 		{
 			var user = await _userManager.GetUserAsync(User);
 			if (user == null)
@@ -139,6 +139,12 @@ namespace Blog_Zaliczeniowy.Controllers
 				return RedirectToAction(nameof(Details), new { id = postId });
 			}
 
+			// Jeśli parentCommentId != null, to znaczy, że jest to odpowiedź na inny komentarz
+			var parentComment = parentCommentId.HasValue
+				? await _context.Comments.FindAsync(parentCommentId.Value)
+				: null;
+
+			// Jeśli nie ma komentarza-rodzica, traktujemy to jako komentarz główny do posta
 			var post = await _context.Posts.FindAsync(postId);
 			if (post == null)
 			{
@@ -150,7 +156,8 @@ namespace Blog_Zaliczeniowy.Controllers
 				Content = commentContent,
 				CreatedAt = DateTime.Now,
 				PostId = postId,
-				UserId = user.Id // Przypisanie UserId (w tym przypadku z zalogowanego użytkownika)
+				UserId = user.Id,
+				ParentCommentId = parentCommentId
 			};
 
 			_context.Comments.Add(comment);
@@ -159,10 +166,10 @@ namespace Blog_Zaliczeniowy.Controllers
 			return RedirectToAction(nameof(Details), new { id = postId });
 		}
 
-        // POST: Posts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+		// POST: Posts/Edit/5
+		// To protect from overposting attacks, enable the specific properties you want to bind to.
+		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+		[HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, PostDTO postDTO)
         {

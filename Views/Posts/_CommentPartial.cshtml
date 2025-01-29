@@ -1,0 +1,26 @@
+﻿@model Blog_Zaliczeniowy.Models.Comment
+
+<div style="margin-left: 20px; border-left: 1px solid #ccc; padding-left: 10px;">
+	<p><strong>@Model.User?.Nickname:</strong> @Model.Content</p>
+	<p><small>Dodano: @Model.CreatedAt</small></p>
+
+	@if (Model.Replies != null && Model.Replies.Any())
+	{
+		foreach (var reply in Model.Replies)
+		{
+			<partial name="_CommentPartial.cshtml" for="@reply" />
+			@* @Html.Partial("_CommentPartial", reply) *@
+		}
+	}
+	@if (Model.ParentCommentId == null)
+	{
+		<form method="post" asp-action="AddComment">
+			<input type="hidden" name="postId" value="@Model.PostId" />
+			<input type="hidden" name="parentCommentId" value="@Model.Id" />
+
+			<textarea name="commentContent"></textarea>
+			<button type="submit">Odpowiedz</button>
+		</form>
+	}
+	<p></p>
+</div>

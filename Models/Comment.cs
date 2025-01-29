@@ -7,10 +7,20 @@ namespace Blog_Zaliczeniowy.Models
 		public int Id { get; set; }
 		public string Content { get; set; }
 		public DateTime CreatedAt { get; set; }
-		public int PostId { get; set; }  // Relacja z postem
-		[ForeignKey("PostId")]
-		public Post Post { get; set; }
-		public string UserId { get; set; }  // Relacja z użytkownikiem
+
+		// Informacja o autorze komentarza
+		public string UserId { get; set; }
 		public ApplicationUser User { get; set; }
+
+		// Powiązanie z postem (dla komentarzy na poziomie "głównym")
+		public int? PostId { get; set; }
+		public virtual Post Post { get; set; }
+
+		// Klucz obcy do komentarza-rodzica (jeśli komentarz to odpowiedź na inny komentarz)
+		public int? ParentCommentId { get; set; }
+		public virtual Comment ParentComment { get; set; }
+
+		// Kolekcja podrzędnych komentarzy (dzieci), czyli odpowiedzi
+		public virtual ICollection<Comment> Replies { get; set; } = new List<Comment>();
 	}
 }

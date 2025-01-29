@@ -9,14 +9,9 @@
 
 <h3>Komentarze</h3>
 
-<!-- Wyświetlanie istniejących komentarzy -->
-@foreach (var comment in Model.Comments)
+@foreach (var comment in Model.Comments.Where(c => c.ParentCommentId == null))
 {
-    <div class="comment">
-        <p><strong>@comment.User.Nickname</strong> napisał:</p>
-        <p>@comment.Content</p>
-        <p><small>Opublikowano: @comment.CreatedAt.ToString("MMMM dd, yyyy HH:mm")</small></p>
-    </div>
+    <partial name="_CommentPartial.cshtml" for="@comment" />
 }
 
 <!-- Formularz do dodawania nowego komentarza -->
