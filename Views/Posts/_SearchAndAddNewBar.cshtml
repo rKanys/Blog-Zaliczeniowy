@@ -1,0 +1,21 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+
+<table style="width: 100%;">
+	<tr>
+		<th>
+			@if (User.Identity.IsAuthenticated)
+			{
+				<p>
+					<a asp-action="Create" class="action-btn">+ Dodaj nowy post</a>
+				</p>
+			}
+		</th>
+		<th style="text-align: right">
+			<form method="get" asp-action="Search" class="search-form">
+				<input type="text" name="search" placeholder="Szukaj..." />
+				<button type="submit">Szukaj</button>
+			</form>
+		</th>
+	</tr>
+</table>

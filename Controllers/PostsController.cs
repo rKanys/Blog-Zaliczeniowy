@@ -14,6 +14,7 @@ using System.Collections.Immutable;
 using Humanizer;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Blog_Zaliczeniowy.Controllers
 {
@@ -28,6 +29,57 @@ namespace Blog_Zaliczeniowy.Controllers
 			_userManager = userManager;
 		}
 
+		// GET: Posts/Search
+		public async Task<IActionResult> Search(string search, int strona = 1)
+		{
+			var posts = await _context.Posts
+				.Include(p => p.User)
+				.Where(v => v.Visibility == true)
+				.ToListAsync();
+			posts.Reverse();
+
+			if (search != null) return View(paginator(posts, "search", strona, search));
+			return View();
+		}
+
+
+		private IEnumerable<Post>? paginator(List<Post> posts, string pagePurpose, int strona = 1, string? search = null)
+		{
+			IEnumerable<Post>? postCollectionVariable = new List<Post>();
+			switch (pagePurpose)
+			{
+				case "index":
+					postCollectionVariable = posts;
+					break;
+				case "search":
+					if (search != null)
+					{
+						postCollectionVariable = posts.Where(p => p.Title.Contains(search) || p.Content.Contains(search));
+					}
+					else
+					{
+						return null;
+					}
+					break;
+			}
+			int perStrona = 5;
+			int postsCounted = postCollectionVariable.Count();
+			int amountToSkip = strona * perStrona - perStrona;
+			int countPerStrona = postsCounted / perStrona;
+			int toSkip = (amountToSkip < postsCounted ? amountToSkip : postsCounted - (postsCounted % perStrona));
+
+			if (toSkip == postsCounted) toSkip -= 1;
+
+			var newPosts = postCollectionVariable.Skip(toSkip).Take(perStrona);
+
+			ViewBag.TotalPages = (postsCounted % perStrona == 0 ? countPerStrona : countPerStrona + 1);
+			ViewBag.PostsFound = postCollectionVariable.Count();
+			ViewBag.CurrentPage = (strona <= ViewBag.TotalPages ? strona : ViewBag.TotalPages);
+			ViewBag.Search = search;
+
+			return newPosts;
+		}
+
 		// GET: Posts
 		public async Task<IActionResult> Index(int strona = 1)
 		{
@@ -36,16 +88,8 @@ namespace Blog_Zaliczeniowy.Controllers
 				.Where(v => v.Visibility == true)
 				.ToListAsync();
 			posts.Reverse();
-			int perStrona = 5;
-			int amountToSkip = strona * perStrona - perStrona;
-			int toSkip = (amountToSkip < posts.Count() ? amountToSkip: (posts.Count() / perStrona) * perStrona);
-			if (toSkip == posts.Count()) toSkip -= 1;
-			int countPerStrona = posts.Count() / perStrona;
-			ViewBag.TotalPages = (posts.Count() % perStrona == 0 ? countPerStrona : countPerStrona + 1);
-			var newPosts = posts.Skip(toSkip).Take(perStrona);
 
-			ViewBag.CurrentPage = (strona <= ViewBag.TotalPages ? strona : ViewBag.TotalPages); 
-			return View(newPosts);
+			return View(paginator(posts, "index", strona, null));
 		}
 
 		// GET: Posts/Details/5

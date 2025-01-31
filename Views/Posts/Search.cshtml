@@ -27,31 +27,31 @@
 
 		<div class="MyPagination">
 
-			<a asp-action="Index" asp-route-strona="1">Pierwsza</a>
+			<a asp-action="search" asp-route-search="@ViewBag.Search" asp-route-strona="1">Pierwsza</a>
 			@if (currentPage <= 1)
 			{
 
-				<a asp-action="Index" id="lastPage" asp-route-strona="@(currentPage)">Poprzednia</a>
+				<a asp-action="search" id="lastPage" asp-route-search="@ViewBag.Search" asp-route-strona="@(currentPage)">Poprzednia</a>
 			}
 			else
 			{
-				<a asp-action="Index" id="lastPage" asp-route-strona="@(currentPage - 1)">Poprzednia</a>
+				<a asp-action="search" id="lastPage" asp-route-search="@ViewBag.Search" asp-route-strona="@(currentPage - 1)">Poprzednia</a>
 			}
 			@foreach (int page in pages)
 			{
-				<a asp-action="Index" asp-route-strona="@(page)" class="@(page == currentPage ? "active" : "")">@(page)</a>
+				<a asp-action="search" asp-route-search="@ViewBag.Search" asp-route-strona="@(page)" class="@(page == currentPage ? "active" : "")">@(page)</a>
 			}
 
 			@if (currentPage == totalPages)
 			{
 
-				<a asp-action="Index" id="lastPage" asp-route-strona="@(currentPage)">Następna</a>
+				<a asp-action="search" id="lastPage" asp-route-search="@ViewBag.Search" asp-route-strona="@(currentPage)">Następna</a>
 			}
 			else
 			{
-				<a asp-action="Index" id="lastPage" asp-route-strona="@(currentPage + 1)">Następna</a>
+				<a asp-action="search" id="lastPage" asp-route-search="@ViewBag.Search" asp-route-strona="@(currentPage + 1)">Następna</a>
 			}
-			<a asp-action="Index" asp-route-strona="@totalPages">Ostatnia</a>
+			<a asp-action="search" asp-route-search="@ViewBag.Search" asp-route-strona="@totalPages">Ostatnia</a>
 
 		</div>
 	}
