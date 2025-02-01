@@ -86,7 +86,7 @@ namespace Blog_Zaliczeniowy
 						var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 						foreach (var error in result.Errors)
 						{
-							logger.LogError($"Nie uda�o si� utworzy� konta: {error.Description}");
+							logger.LogError($"Nie udało się utworzć konta: {error.Description}");
 						}
 					}
 				}

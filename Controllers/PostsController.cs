@@ -300,7 +300,7 @@ namespace Blog_Zaliczeniowy.Controllers
 				}
 			}
 			ViewData["UserId"] = new SelectList(_context.Users, "Id", "Nickname", post.UserId);
-			return RedirectToAction(nameof(Index));
+			return RedirectToAction("Details", new { id = id });
 		}
 
 		// GET: Posts/Delete/5

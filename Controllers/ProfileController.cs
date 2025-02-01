@@ -110,27 +110,5 @@ namespace Blog_Zaliczeniowy.Controllers
 
             return RedirectToAction("Index", new { userId = user.Id });
         }
-
-        // POST: /Profile/Delete
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")] // Restrict to admins only
-        public async Task<IActionResult> Delete(string userId)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            // Soft delete (mark as deleted)
-            user.IsDeleted = true;
-            await _userManager.UpdateAsync(user);
-
-            // OR hard delete (remove from database)
-            // var result = await _userManager.DeleteAsync(user);
-
-            return RedirectToAction("Index", "Home"); // Redirect to home or user list
-        }
     }
 }

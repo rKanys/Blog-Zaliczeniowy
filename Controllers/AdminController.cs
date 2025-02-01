@@ -175,7 +175,7 @@ namespace Blog_Zaliczeniowy.Controllers
 
 			return View(comments);
 		}
-		[HttpPost]
+		[HttpGet]
 		public async Task<IActionResult> DeleteComment(int id)
 		{
 			var comment = await _context.Comments.FindAsync(id);
@@ -209,6 +209,22 @@ namespace Blog_Zaliczeniowy.Controllers
 				await _context.SaveChangesAsync();
 			}
 			return RedirectToAction("Posts");
+		}
+
+
+		// POST: /Profile/Delete
+		[HttpGet]
+		public async Task<IActionResult> DeleteUser(string id)
+		{
+			var user = await _userManager.FindByIdAsync(id);
+			if (user == null)
+			{
+				return NotFound();
+			}
+			user.IsDeleted = true;
+			await _userManager.UpdateAsync(user);
+
+			return RedirectToAction("Users", "Admin");
 		}
 	}
 }

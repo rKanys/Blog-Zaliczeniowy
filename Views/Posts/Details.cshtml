@@ -1,8 +1,24 @@
 ﻿@model Blog_Zaliczeniowy.Models.Post
+@using Microsoft.AspNetCore.Identity
+@using System.Web
+@inject UserManager<ApplicationUser> UserManager
 
 <div class="container" style="word-wrap:break-word">
 
-<h2>@Model.Title</h2>
+<table width="100%">
+    <tr>
+	    <th><h4>@Model.Title</h4></th>
+	    @if (UserManager.GetUserId(User) == @Model.UserId || User.IsInRole("Administrator"))
+	    {
+	    <th style="text-align: right">
+		    <div class="post-actions">
+			    <a asp-action="Edit" asp-route-id="@Model.Id" class="action-btn">Edytuj</a>
+			    <a asp-action="Delete" asp-route-id="@Model.Id" class="action-btn action-delete">Usuń</a>
+		    </div>
+	    </th>
+	    }
+    </tr>
+</table>
 <p><strong>Autor:</strong> @Model.User.Nickname</p>
 <p><strong>Data publikacji:</strong> @Model.CreatedAt.ToString("MMMM dd, yyyy")</p>
 <p>@Html.Raw(@Model.Content)</p>
