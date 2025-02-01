@@ -51,8 +51,8 @@ namespace Blog_Zaliczeniowy.Controllers
                 LoginCount = user.LoginCount,
                 PostCount = postCount,
             };
-
-            var currentUserId2 = _userManager.GetUserId(User);
+            ViewData["AboutMe"] = user.AboutMe;
+			var currentUserId2 = _userManager.GetUserId(User);
             model.IsOwner = (currentUserId2 == userId);
 
             return View(model);

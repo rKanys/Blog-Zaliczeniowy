@@ -1,21 +1,151 @@
 ﻿@model ProfileViewModel
 
-<h2>Profil użytkownika @Model.Nickname</h2>
+<div class="profile-container">
+    <h2 class="profile-title">Profil użytkownika @Model.Nickname</h2>
 
-<p>Data rejestracji: @Model.RegistrationDate.ToString("dd MMM yyyy")</p>
-<p>Ostatnie logowanie: @(Model.LastLoginDate.HasValue ? Model.LastLoginDate.ToString() : "Brak danych")</p>
+    <div class="profile-dates">
+        <p>Data rejestracji: @Model.RegistrationDate.ToString("dd MMM yyyy")</p>
+        <p>
+            Ostatnie logowanie:
+            @(Model.LastLoginDate.HasValue
+                ? Model.LastLoginDate.ToString()
+                : "Brak danych")
+        </p>
+    </div>
 
-@if (Model.IsOwner)
-{
-    <p>Twoja liczba logowań: @Model.LoginCount</p>
-    <p>Twoja liczba postów: @Model.PostCount</p>
-    <a asp-action="Edit" asp-route-userId="@Model.UserId">Edytuj profil</a>
-}
-else
-{
-    <p>Liczba postów użytkownika: @Model.PostCount</p>
-    <form asp-controller="Messages" asp-action="Send" asp-route-recipientId="@Model.UserId">
-        <input type="hidden" name="recipientId" value="@Model.UserId" />
-        <button type="submit">Wyślij wiadomość</button>
-    </form>
-}
+    <div class="profile-about">
+        <p class="profile-label">Opis:</p>
+        <div class="profile-about-content">
+            @Html.Raw(ViewData["AboutMe"])
+        </div>
+    </div>
+
+    @if (Model.IsOwner)
+    {
+        <div class="profile-owner">
+            <p>Twoja liczba logowań: <strong>@Model.LoginCount</strong></p>
+            <p>Twoja liczba postów: <strong>@Model.PostCount</strong></p>
+
+            <a class="btn btn-edit" asp-action="Edit" asp-route-userId="@Model.UserId">
+                Edytuj profil
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="profile-guest">
+            <p>Liczba postów użytkownika: <strong>@Model.PostCount</strong></p>
+
+            <form class="profile-message-form"
+                  asp-controller="Messages"
+                  asp-action="Send"
+                  asp-route-recipientId="@Model.UserId">
+                <input type="hidden" name="recipientId" value="@Model.UserId" />
+                <button class="btn btn-message" type="submit">Wyślij wiadomość</button>
+            </form>
+        </div>
+    }
+</div>
+
+        <style>
+    .profile-container {
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #fff; /* Jeżeli używasz tła */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        font-family: sans-serif; /* Lub inna rodzina czcionek */
+    }
+
+    .profile-title {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        text-align: center;
+        color: #333;
+        font-weight: 600;
+    }
+
+    /* === Dates Section === */
+    .profile-dates p {
+        margin: 0 0 8px 0;
+        line-height: 1.4;
+    }
+
+    /* === About Me === */
+    .profile-about {
+        margin: 20px 0;
+    }
+
+    .profile-label {
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #555;
+    }
+
+    .profile-about-content {
+        background-color: #f8f9fa; /* delikatne tło */
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #eee;
+        min-height: 60px; /* aby nie wyglądało zbyt ciasno przy pustym polu */
+    }
+
+    /* === Owner Section (widoczne tylko dla właściciela) === */
+    .profile-owner {
+        margin-top: 20px;
+    }
+
+    /* === Guest Section (widoczne tylko dla innych użytkowników) === */
+    .profile-guest {
+        margin-top: 20px;
+    }
+
+        /* Przykładowe wyróżnienie liczb w <strong> */
+        .profile-owner strong,
+        .profile-guest strong {
+            color: #007bff; /* Kolor w stylu Bootstrap */
+        }
+
+    /* === Przycisk Edycji Profilu === */
+    .btn-edit {
+        display: inline-block;
+        padding: 8px 16px;
+        background-color: #0069d9; /* lub #007bff */
+        color: #fff;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-top: 10px;
+        font-size: 0.9rem;
+        transition: background-color 0.2s ease;
+        border: none;
+    }
+
+        .btn-edit:hover {
+            background-color: #005bb5;
+        }
+
+    /* === Formularz wysyłania wiadomości === */
+    .profile-message-form {
+        margin-top: 10px;
+    }
+
+    /* === Przycisk wiadomości === */
+    .btn-message {
+        display: inline-block;
+        padding: 8px 16px;
+        background-color: #28a745; /* styl przycisku success */
+        color: #fff;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        border: none;
+        transition: background-color 0.2s ease;
+        cursor: pointer;
+    }
+
+        .btn-message:hover {
+            background-color: #218838;
+        }</style>
