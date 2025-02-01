@@ -14,7 +14,7 @@
 else
 {
     <p>Liczba postów użytkownika: @Model.PostCount</p>
-    <form asp-action="SendMessage">
+    <form asp-controller="Messages" asp-action="Send" asp-route-recipientId="@Model.UserId">
         <input type="hidden" name="recipientId" value="@Model.UserId" />
         <button type="submit">Wyślij wiadomość</button>
     </form>
