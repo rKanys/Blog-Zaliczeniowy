@@ -13,9 +13,26 @@
 			selector: '.wysiwyg',
 			license_key: 'gpl',
 			menubar: false,
-			plugins: 'lists link image preview',
+			paste_as_text: true,
+			plugins: 'lists link image preview wordcount',
 			toolbar: 'undo redo | bold italic underline | bullist numlist | link image | preview',
-			branding: false
+			branding: false,
+			setup: function(editor) {
+				var min = 3;
+				var max = 8000;
+				editor.on('submit', function(event) {
+					var numChars = tinymce.activeEditor.plugins.wordcount.body.getCharacterCount();
+					if (numChars < min) {
+						document.getElementById("Content-error").innerHTML = "Wiadomość musi się składać z conajmniej 3 znaków!";
+						event.preventDefault();
+						return false;
+					} else if (numChars > max) {
+						document.getElementById("Content-error").innerHTML = "Wiadomość musi się składać z maksymalnie 8000 znaków!";
+						event.preventDefault();
+						return false;
+					}
+				})
+			}
 		});
 	</script>
 	<style>
@@ -188,6 +205,12 @@
 						{
 							<li class="nav-item">
 								<a class="nav-link text-dark" asp-area="" asp-controller="posts" asp-action="WaitingRoom">Poczekalnia</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link text-dark" asp-controller="Messages" asp-action="Inbox">Odebrane</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link text-dark" asp-controller="Messages" asp-action="Sent">Wysłane</a>
 							</li>
 						}
 						@if (User.IsInRole("Administrator"))

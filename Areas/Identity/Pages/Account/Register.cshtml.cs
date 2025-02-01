@@ -124,7 +124,8 @@ namespace Blog_Zaliczeniowy.Areas.Identity.Pages.Account
 				{
 					UserName = Input.Email,
 					Email = Input.Email,
-					Nickname = Input.Nickname
+					Nickname = Input.Nickname,
+                    RegistrationDate = DateTime.Now
 				};
 
 				await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);

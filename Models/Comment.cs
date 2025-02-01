@@ -1,26 +1,26 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Blog_Zaliczeniowy.Models
 {
 	public class Comment
 	{
 		public int Id { get; set; }
+		[Required]
+		[Display(Name = "Komentarz")]
+		[StringLength(2000)]
 		public string Content { get; set; }
 		public DateTime CreatedAt { get; set; }
 
-		// Informacja o autorze komentarza
 		public string UserId { get; set; }
 		public ApplicationUser User { get; set; }
 
-		// Powiązanie z postem (dla komentarzy na poziomie "głównym")
 		public int? PostId { get; set; }
 		public virtual Post Post { get; set; }
 
-		// Klucz obcy do komentarza-rodzica (jeśli komentarz to odpowiedź na inny komentarz)
 		public int? ParentCommentId { get; set; }
 		public virtual Comment ParentComment { get; set; }
 
-		// Kolekcja podrzędnych komentarzy (dzieci), czyli odpowiedzi
 		public virtual ICollection<Comment> Replies { get; set; } = new List<Comment>();
 
 		public bool Visibility { get; set; } = true;

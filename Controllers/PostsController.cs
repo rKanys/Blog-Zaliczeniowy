@@ -184,7 +184,7 @@ namespace Blog_Zaliczeniowy.Controllers
 
 					_context.Add(post);
 					await _context.SaveChangesAsync();
-					return RedirectToAction(nameof(Index)); 
+					return RedirectToAction(nameof(WaitingRoom)); 
 				}
 				else
 				{
@@ -193,7 +193,8 @@ namespace Blog_Zaliczeniowy.Controllers
 					return View(postDTO);
 				}
 			}
-			return View(postDTO);
+			ViewBag.Error = "Zawartość posta musi mieć co najmniej 1 znak i maksymalnie 8000 znaków!";
+			return RedirectToAction(nameof(Create));
 		}
 
 		// GET: Posts/Edit/5

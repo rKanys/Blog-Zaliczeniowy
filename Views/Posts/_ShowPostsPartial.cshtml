@@ -36,7 +36,7 @@
 
 
 			<div class="post-meta">
-				Autor: @item.User?.Nickname
+				Autor: <a asp-controller="Profile" asp-action="Index" asp-route-userId="@item.UserId">@item.User?.Nickname</a>
 				| Data publikacji: @item.CreatedAt.ToString("dd MMM yyyy, HH:mm")
 			</div>
 

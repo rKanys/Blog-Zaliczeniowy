@@ -1,0 +1,14 @@
+﻿@model Blog_Zaliczeniowy.Models.PrivateMessage
+
+<h2>Szczegóły wiadomości</h2>
+<p><strong>Nadawca:</strong> @Model.Sender?.Nickname</p>
+<p><strong>Odbiorca:</strong> @Model.Recipient?.Nickname</p>
+<p><strong>Data:</strong> @Model.SentAt</p>
+<hr />
+<p>@Model.Content</p>
+
+<!-- Ewentualnie przycisk usuwania -->
+<form asp-action="Delete" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button type="submit" class="btn btn-danger">Usuń</button>
+</form>

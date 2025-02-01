@@ -4,12 +4,11 @@
 @inject RoleManager<IdentityRole> RoleManager
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Napisz nowy post";
 }
 
-<h1>Create</h1>
+<h1>Napisz nowy post</h1>
 
-<h4>Post</h4>
 <hr />
 <div class="row">
     <div class="col-md-12">
@@ -20,9 +19,12 @@
                 <input asp-for="Title" class="form-control" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
+            <span class="text-danger field-validation-error" data-valmsg-for="Content" data-valmsg-replace="true">
+                <span id="Content-error" class=""></span>
+                </span>
             <div class="form-group">
                 <label asp-for="Content" class="control-label"></label>
-                <textarea asp-for="Content" class="form-control wysiwyg"></textarea>
+                <textarea asp-for="Content" class="form-control wysiwyg" required></textarea>
                 <span asp-validation-for="Content" class="text-danger"></span>
             </div>
             <div class="form-group">

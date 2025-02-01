@@ -1,0 +1,21 @@
+﻿@model ProfileViewModel
+
+<h2>Profil użytkownika @Model.Nickname</h2>
+
+<p>Data rejestracji: @Model.RegistrationDate.ToString("dd MMM yyyy")</p>
+<p>Ostatnie logowanie: @(Model.LastLoginDate.HasValue ? Model.LastLoginDate.ToString() : "Brak danych")</p>
+
+@if (Model.IsOwner)
+{
+    <p>Twoja liczba logowań: @Model.LoginCount</p>
+    <p>Twoja liczba postów: @Model.PostCount</p>
+    <a asp-action="Edit" asp-route-userId="@Model.UserId">Edytuj profil</a>
+}
+else
+{
+    <p>Liczba postów użytkownika: @Model.PostCount</p>
+    <form asp-action="SendMessage">
+        <input type="hidden" name="recipientId" value="@Model.UserId" />
+        <button type="submit">Wyślij wiadomość</button>
+    </form>
+}

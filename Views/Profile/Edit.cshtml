@@ -1,0 +1,22 @@
+﻿@model EditProfileViewModel
+@{
+    ViewData["Title"] = "Edytuj profil";
+}
+
+<h2>Edytuj profil</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="UserId" />
+    <div class="form-group">
+        <label asp-for="Nickname"></label>
+        <input asp-for="Nickname" class="form-control" />
+        <span asp-validation-for="Nickname"></span>
+    </div>
+
+    <div>
+        <label asp-for="AboutMe"></label>
+        <textarea class="wysiwyg" asp-for="AboutMe"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Zapisz</button>
+</form>

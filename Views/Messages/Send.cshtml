@@ -1,0 +1,13 @@
+﻿@model SendMessageViewModel
+
+<h2>Wyślij wiadomość</h2>
+
+<form asp-action="Send" method="post">
+    <input type="hidden" asp-for="RecipientId" />
+    <div class="form-group">
+        <label>Treść</label>
+        <textarea asp-for="Content" class="form-control" rows="5"></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Wyślij</button>
+</form>

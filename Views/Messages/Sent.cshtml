@@ -1,0 +1,29 @@
+﻿@model IEnumerable<Blog_Zaliczeniowy.Models.PrivateMessage>
+@{
+    ViewData["Title"] = "Wysłane";
+}
+
+<h2>Wysłane wiadomości</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Odbiorca</th>
+            <th>Treść</th>
+            <th>Data</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var msg in Model)
+        {
+            <tr>
+                <td>@msg.Recipient?.Nickname</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@msg.Id">
+                        @msg.Content.Substring(0, Math.Min(30, msg.Content.Length))...
+                    </a>
+                </td>
+                <td>@msg.SentAt</td>
+            </tr>
+        }
+    </tbody>
+</table>
