@@ -47,7 +47,7 @@ namespace Blog_Zaliczeniowy.Controllers
 			return View();
 		}
 
-		
+
 		private IEnumerable<Post>? paginator(List<Post> posts, string pagePurpose, int strona = 1, string? search = null)
 		{
 			IEnumerable<Post>? postCollectionVariable = new List<Post>();
@@ -141,7 +141,7 @@ namespace Blog_Zaliczeniowy.Controllers
 
 			var post = await _context.Posts
 				.Include(p => p.User)
-				.Include(p => p.Comments) 
+				.Include(p => p.Comments)
 				.ThenInclude(c => c.User)
 				.FirstOrDefaultAsync(m => m.Id == id);
 
@@ -179,12 +179,12 @@ namespace Blog_Zaliczeniowy.Controllers
 						Content = postDTO.Content,
 						CreatedAt = DateTime.Now,
 						UserId = user.Id,
-						User = user 
+						User = user
 					};
 
 					_context.Add(post);
 					await _context.SaveChangesAsync();
-					return RedirectToAction(nameof(WaitingRoom)); 
+					return RedirectToAction(nameof(WaitingRoom));
 				}
 				else
 				{
@@ -352,6 +352,90 @@ namespace Blog_Zaliczeniowy.Controllers
 		private bool PostExists(int id)
 		{
 			return _context.Posts.Any(e => e.Id == id);
+		}
+
+		[HttpGet]
+		public IActionResult Advanced()
+		{
+			var users = _context.Users
+				.Select(u => new { u.Id, u.Nickname })
+				.ToList();
+
+			ViewBag.Users = new SelectList(_context.Users, "Id", "Nickname", ""); ;
+			return View(new AdvancedSearchViewModel());
+		}
+
+		[HttpPost]
+		public IActionResult Advanced(AdvancedSearchViewModel model)
+		{
+			var users = _context.Users
+				.Select(u => new { u.Id, u.Nickname })
+				.ToList();
+
+			ViewBag.Users = new SelectList(_context.Users, "Id", "Nickname", ""); ;
+
+			var query = _context.Posts
+				.Include(p => p.User)
+				.AsQueryable();
+
+			// Filtrowanie tytułu (zawiera)
+			if (!string.IsNullOrEmpty(model.Title))
+			{
+				query = query.Where(p => p.Title.Contains(model.Title));
+			}
+
+			// Filtrowanie zawartości
+			if (!string.IsNullOrEmpty(model.Content))
+			{
+				query = query.Where(p => p.Content.Contains(model.Content));
+			}
+
+			// Filtrowanie daty publikacji
+			if (model.FromDate.HasValue)
+			{
+				query = query.Where(p => p.CreatedAt >= model.FromDate.Value);
+			}
+
+			if (model.ToDate.HasValue)
+			{
+				// Zawężenie wzlędem daty
+				var toDate = model.ToDate.Value.AddDays(1).AddSeconds(-1);
+				query = query.Where(p => p.CreatedAt <= toDate);
+			}
+
+			// Filtrowanie autora
+			if (!string.IsNullOrEmpty(model.UserId))
+			{
+				query = query.Where(p => p.UserId == model.UserId);
+			}
+
+			// Agregacje
+			// Liczba znalezionych postów
+			model.TotalCount = query.Count();
+
+			// Łączna ilość znaków w postach użytkownika
+			model.TotalContentLength = query
+				.Sum(p => p.Content.Length);
+
+			// Grupowanie po użytkowniku
+			var postsByUser = query
+				.GroupBy(p => new { p.UserId, p.User.Nickname })
+				.Select(g => new PostsByUserAggregate
+				{
+					UserId = g.Key.UserId,
+					Nickname = g.Key.Nickname,
+					Count = g.Count(),
+					TotalContentLength = g.Sum(x => x.Content.Length)
+				})
+				.ToList();
+
+			model.PostsByUser = postsByUser;
+
+			model.Results = query
+				.OrderByDescending(p => p.CreatedAt)
+				.ToList();
+
+			return View(model);
 		}
 	}
 }

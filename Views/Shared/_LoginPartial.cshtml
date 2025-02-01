@@ -7,24 +7,15 @@
 	{
 		var currentUser = await UserManager.GetUserAsync(User);
 		<li class="nav-item">
-			<!-- Twoje linki w menu... -->
-			@if (true)
+			@if (currentUser != null)
 			{
-				if (currentUser != null)
+				var roles = await UserManager.GetRolesAsync(currentUser);
+				if (roles.Contains("Administrator"))
 				{
-					// Pobieramy listę ról
-					var roles = await UserManager.GetRolesAsync(currentUser);
-					if (roles.Any())
-					{
-						<span>Rola: @string.Join(", ", roles)</span>
-					}
-					else
-					{
-						<span>Brak przypisanej roli</span>
-					}
+					<span>Rola: @string.Join(", ", roles)</span>
 				}
-
 			}
+
 
 		</li>
 		<li class="nav-item">

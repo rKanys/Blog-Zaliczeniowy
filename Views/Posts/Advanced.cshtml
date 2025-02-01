@@ -1,0 +1,96 @@
+﻿@model AdvancedSearchViewModel
+
+@{
+    ViewData["Title"] = "Zaawansowane wyszukiwanie";
+}
+
+<h2>Zaawansowane wyszukiwanie</h2>
+
+<form method="post" asp-action="Advanced">
+    <div class="form-group">
+        <label for="title">Tytuł zawiera:</label>
+        <input type="text" id="title" name="Title" class="form-control" value="@Model.Title" />
+    </div>
+
+    <div class="form-group">
+        <label for="content">Treść zawiera:</label>
+        <input type="text" id="content" name="Content" class="form-control" value="@Model.Content" />
+    </div>
+
+    <div class="form-group">
+        <label for="fromDate">Od daty:</label>
+        <input type="date" id="fromDate" name="FromDate" class="form-control" value="@(Model.FromDate?.ToString("yyyy-MM-dd"))" />
+    </div>
+
+    <div class="form-group">
+        <label for="toDate">Do daty:</label>
+        <input type="date" id="toDate" name="ToDate" class="form-control" value="@(Model.ToDate?.ToString("yyyy-MM-dd"))" />
+    </div>
+
+    <!-- Przykład wyboru autora -->
+    <div class="form-group">
+        <label for="UserId">Autor:</label>
+            <select asp-for="UserId" name="UserId" class="form-control" asp-items="@(ViewBag.Users)">
+                <option value="" default>>>> Wybierz Autora lub szukaj wszystkich <<<</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Szukaj</button>
+</form>
+
+<hr />
+
+@if (Model.Results != null && Model.Results.Any())
+{
+    <h4>Wyniki wyszukiwania</h4>
+
+    <p>Liczba postów: @Model.TotalCount</p>
+    <p>Suma długości treści: @Model.TotalContentLength</p>
+
+    <h5>Grupowanie według autora</h5>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Autor</th>
+                <th>Liczba postów</th>
+                <th>Suma długości treści</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var group in Model.PostsByUser)
+            {
+                <tr>
+                    <td><a asp-controller="Profile" asp-action="Index" asp-route-userId="@group.UserId">@group.Nickname (@group.UserId)</a></td>
+                    <td>@group.Count</td>
+                    <td>@group.TotalContentLength</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <hr />
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Tytuł</th>
+                <th>Autor</th>
+                <th>Data publikacji</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var post in Model.Results)
+            {
+                <tr>
+                    <td><a asp-controller="posts" asp-action="Details" asp-route-id="@post.Id">@post.Title</a></td>
+                    <td><a asp-controller="Profile" asp-action="Index" asp-route-userId="@post.UserId">@post.User?.Nickname</a></td>
+                    <td>@post.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Brak wyników wyszukiwania.</p>
+}
