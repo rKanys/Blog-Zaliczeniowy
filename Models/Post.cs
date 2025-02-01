@@ -10,5 +10,6 @@
 		public ApplicationUser User { get; set; }
 		public List<Comment> Comments { get; set; } = new List<Comment>();
 		public bool Visibility { get; set; } = true;
+		public bool Approved { get; set; } = false; 
 	}
 }

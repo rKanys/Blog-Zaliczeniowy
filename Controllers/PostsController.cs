@@ -15,9 +15,11 @@ using Humanizer;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Blog_Zaliczeniowy.Controllers
 {
+	[Authorize]
 	public class PostsController : Controller
 	{
 		private readonly ApplicationDbContext _context;
@@ -30,11 +32,14 @@ namespace Blog_Zaliczeniowy.Controllers
 		}
 
 		// GET: Posts/Search
+		[AllowAnonymous]
+		[HttpGet]
 		public async Task<IActionResult> Search(string search, int strona = 1)
 		{
 			var posts = await _context.Posts
 				.Include(p => p.User)
 				.Where(v => v.Visibility == true)
+				.Where(v => v.Approved == true)
 				.ToListAsync();
 			posts.Reverse();
 
@@ -42,7 +47,7 @@ namespace Blog_Zaliczeniowy.Controllers
 			return View();
 		}
 
-
+		
 		private IEnumerable<Post>? paginator(List<Post> posts, string pagePurpose, int strona = 1, string? search = null)
 		{
 			IEnumerable<Post>? postCollectionVariable = new List<Post>();
@@ -81,17 +86,51 @@ namespace Blog_Zaliczeniowy.Controllers
 		}
 
 		// GET: Posts
+		[AllowAnonymous]
+		[HttpGet]
 		public async Task<IActionResult> Index(int strona = 1)
 		{
 			var posts = await _context.Posts
 				.Include(p => p.User)
 				.Where(v => v.Visibility == true)
+				.Where(v => v.Approved == true)
 				.ToListAsync();
 			posts.Reverse();
 
 			return View(paginator(posts, "index", strona, null));
 		}
 
+		[AllowAnonymous]
+		[HttpGet]
+		public async Task<IActionResult> WaitingRoom(int strona = 1)
+		{
+			var posts = await _context.Posts
+				.Include(p => p.User)
+				.Where(v => v.Visibility == true)
+				.Where(v => v.Approved == false)
+				.ToListAsync();
+			posts.Reverse();
+
+			ViewBag.WaitingRoom = true;
+			return View(paginator(posts, "index", strona));
+		}
+
+		[Authorize(Roles = "Administrator")]
+		[HttpGet]
+		public async Task<IActionResult> Approve(int id)
+		{
+			var post = await _context.Posts.FindAsync(id);
+			if (post != null)
+			{
+				post.Approved = true;
+				_context.Posts.Update(post);
+				await _context.SaveChangesAsync();
+			}
+			return RedirectToAction("WaitingRoom");
+		}
+
+		[AllowAnonymous]
+		[HttpGet]
 		// GET: Posts/Details/5
 		public async Task<IActionResult> Details(int? id)
 		{
@@ -102,7 +141,7 @@ namespace Blog_Zaliczeniowy.Controllers
 
 			var post = await _context.Posts
 				.Include(p => p.User)
-				.Include(p => p.Comments)  // Wczytanie powiązanych komentarzy
+				.Include(p => p.Comments) 
 				.ThenInclude(c => c.User)
 				.FirstOrDefaultAsync(m => m.Id == id);
 
@@ -115,16 +154,14 @@ namespace Blog_Zaliczeniowy.Controllers
 		}
 
 		// GET: Posts/Create
+		[Authorize]
 		public IActionResult Create()
 		{
-			//ViewBag.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			ViewData["UserId"] = new SelectList(_context.Users, "Id", "Nickname", User.FindFirstValue(ClaimTypes.NameIdentifier));
 			return View();
 		}
 
-		// POST: Posts/Create
-		// To protect from overposting attacks, enable the specific properties you want to bind to.
-		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Create(PostDTO postDTO)
@@ -140,14 +177,14 @@ namespace Blog_Zaliczeniowy.Controllers
 					{
 						Title = postDTO.Title,
 						Content = postDTO.Content,
-						CreatedAt = DateTime.Now,  // Ustaw datę stworzenia posta
-						UserId = user.Id,  // Przypisz UserId do posta
-						User = user  // Przypisz użytkownika do posta
+						CreatedAt = DateTime.Now,
+						UserId = user.Id,
+						User = user 
 					};
 
 					_context.Add(post);
 					await _context.SaveChangesAsync();
-					return RedirectToAction(nameof(Index));  // Przekierowanie na stronę z postami
+					return RedirectToAction(nameof(Index)); 
 				}
 				else
 				{
@@ -168,7 +205,6 @@ namespace Blog_Zaliczeniowy.Controllers
 			}
 
 			var post = await _context.Posts
-				//.FindAsync(id);
 				.Include(p => p.User)
 				.FirstOrDefaultAsync(m => m.Id == id);
 			if (post == null)
@@ -224,9 +260,6 @@ namespace Blog_Zaliczeniowy.Controllers
 			return RedirectToAction(nameof(Details), new { id = postId });
 		}
 
-		// POST: Posts/Edit/5
-		// To protect from overposting attacks, enable the specific properties you want to bind to.
-		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Edit(int id, PostDTO postDTO)
@@ -270,6 +303,7 @@ namespace Blog_Zaliczeniowy.Controllers
 		}
 
 		// GET: Posts/Delete/5
+		[Authorize]
 		public async Task<IActionResult> Delete(int? id)
 		{
 			if (id == null)
@@ -284,8 +318,9 @@ namespace Blog_Zaliczeniowy.Controllers
 			{
 				return NotFound();
 			}
-
-			return View(post);
+			var _user = _userManager.GetUserId(User);
+			if (post.UserId == _user || User.IsInRole("Administrator")) return View(post);
+			return RedirectToAction(nameof(Index));
 		}
 
 		// POST: Posts/Delete/5
@@ -297,7 +332,7 @@ namespace Blog_Zaliczeniowy.Controllers
 			if (post != null)
 			{
 				var _user = _userManager.GetUserId(User);
-				if (post.UserId == _user)
+				if (post.UserId == _user || User.IsInRole("Administrator"))
 				{
 					post.Visibility = false;
 					_context.Posts.Update(post);

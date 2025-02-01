@@ -1,189 +1,221 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Blog_Zaliczeniowy</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Blog_Zaliczeniowy.styles.css" asp-append-version="true" />
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-            color: #333;
-        }
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - Blog_Zaliczeniowy</title>
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/Blog_Zaliczeniowy.styles.css" asp-append-version="true" />
+	<script src="~/lib/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
+	<script>
+		tinymce.init({
+			selector: '.wysiwyg',
+			license_key: 'gpl',
+			menubar: false,
+			plugins: 'lists link image preview',
+			toolbar: 'undo redo | bold italic underline | bullist numlist | link image | preview',
+			branding: false
+		});
+	</script>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+			background: #f5f5f5;
+			color: #333;
+		}
 
-        .blog-container {
-            width: 95%;
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 0 15px;
-        }
+		a:hover.action-btn {
+			color: blanchedalmond;
+		}
 
-        .page-title {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+		.blog-container {
+			width: 95%;
+			max-width: 900px;
+			margin: 40px auto;
+			padding: 0 15px;
+		}
 
-        .post-card {
-            background: #fff;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            overflow: hidden;
-            position: relative;
-            padding: 20px;
-        }
+		.page-title {
+			text-align: center;
+			margin-bottom: 30px;
+		}
 
-        .post-title {
-            font-size: 1.4rem;
-            margin-bottom: 8px;
-            color: #007bff;
-            text-decoration: none;
-        }
+		.post-card {
+			background: #fff;
+			border-radius: 6px;
+			margin-bottom: 20px;
+			box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+			overflow: hidden;
+			position: relative;
+			padding: 20px;
+		}
 
-            .post-title:hover {
-                text-decoration: underline;
-            }
+		.post-title {
+			font-size: 1.4rem;
+			margin-bottom: 8px;
+			color: #007bff;
+			text-decoration: none;
+		}
 
-        .post-meta {
-            font-size: 0.9rem;
-            color: #777;
-            margin-bottom: 12px;
-        }
+			.post-title:hover {
+				text-decoration: underline;
+			}
 
-        .post-content {
-            font-size: 1rem;
-            line-height: 1.6;
-            position: relative;
-            color: #444;
-        }
+		.post-meta {
+			font-size: 0.9rem;
+			color: #777;
+			margin-bottom: 12px;
+		}
 
-        /* Fade-out efekt przy ucięciu */
-        .content-fade {
-            max-height: 140px;
-            overflow: hidden;
-            position: relative;
-        }
+		.post-content {
+			font-size: 1rem;
+			line-height: 1.6;
+			position: relative;
+			color: #444;
+			word-wrap: break-word
+		}
 
-            .content-fade::after {
-                content: "";
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 50px;
-                background: linear-gradient(rgba(255,255,255,0), #fff 80%);
-            }
+		img {
+			max-width: -webkit-fill-available;
+			max-height: fit-content;
+		}
 
-        .read-more {
-            display: inline-block;
-            margin-top: 10px;
-            color: #007bff;
-            text-decoration: none;
-            font-weight: 500;
-        }
+		/* Fade-out efekt przy ucięciu */
+		.content-fade {
+			min-height: 70px;
+			max-height: 380px;
+			overflow: hidden;
+			position: relative;
+		}
 
-            .read-more:hover {
-                text-decoration: underline;
-            }
+			.content-fade::after {
+				content: "";
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				height: 50px;
+				background: linear-gradient(rgba(255,255,255,0), #fff 80%);
+			}
 
-        .action-btn {
-            display: inline-block;
-            background: #007bff;
-            color: #fff;
-            text-decoration: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            margin-right: 6px;
-            font-size: 0.9rem;
-        }
+		.read-more {
+			display: inline-block;
+			margin-top: 10px;
+			color: #007bff;
+			text-decoration: none;
+			font-weight: 500;
+		}
 
-            .action-btn:hover {
-                background: #0056b3;
-            }
+			.read-more:hover {
+				text-decoration: underline;
+			}
 
-        .action-delete {
-            background: #dc3545;
-        }
+		.action-btn {
+			display: inline-block;
+			background: #007bff;
+			color: #fff;
+			text-decoration: none;
+			padding: 6px 12px;
+			border-radius: 4px;
+			margin-right: 6px;
+			font-size: 0.9rem;
+		}
 
-            .action-delete:hover {
-                background: #c82333;
-            }
+			.action-btn:hover {
+				background: #0056b3;
+			}
 
-        /* Paginacja */
-        .MyPagination {
-            text-align: center;
-            margin: 30px 0;
-        }
+		.action-delete {
+			background: #dc3545;
+		}
 
-            .MyPagination a {
-                display: inline-block;
-                margin: 0 5px;
-                padding: 8px 12px;
-                color: #007bff;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                text-decoration: none;
-            }
+			.action-delete:hover {
+				background: #c82333;
+			}
 
-                .MyPagination a:hover {
-                    background: #eee;
-                }
+		.action-success {
+			background: #57E200;
+		}
 
-            .MyPagination .active {
-                background: #007bff;
-                color: #fff;
-                border-color: #007bff;
-            }
-    </style>
+			.action-success:hover {
+				background: #41AA00
+			}
+		/* Paginacja */
+		.MyPagination {
+			text-align: center;
+			margin: 30px 0;
+		}
+
+			.MyPagination a {
+				display: inline-block;
+				margin: 0 5px;
+				padding: 8px 12px;
+				color: #007bff;
+				border: 1px solid #ddd;
+				border-radius: 4px;
+				text-decoration: none;
+			}
+
+				.MyPagination a:hover {
+					background: #eee;
+				}
+
+			.MyPagination .active {
+				background: #007bff;
+				color: #fff;
+				border-color: #007bff;
+			}
+	</style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="posts" asp-action="Index">Blog_Zaliczeniowy</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="posts" asp-action="Index">Strona Główna</a>
-                        </li
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="posts" asp-action="WaitRoom">Poczekalnia</a>
-                        </li>
-                        @if (User.IsInRole("Administrator"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Admin" asp-action="Index">Panel administratora</a>
-                            </li>
-                        }
-                    </ul>
-                    <partial name="_LoginPartial" />
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+	<header>
+		<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+			<div class="container-fluid">
+				<a class="navbar-brand" asp-area="" asp-controller="posts" asp-action="Index">Blog_Zaliczeniowy</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+						aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+					<ul class="navbar-nav flex-grow-1">
+						<li class="nav-item">
+							<a class="nav-link text-dark" asp-area="" asp-controller="posts" asp-action="Index">Strona Główna</a>
+						</li>
+						@if (User.Identity.IsAuthenticated)
+						{
+							<li class="nav-item">
+								<a class="nav-link text-dark" asp-area="" asp-controller="posts" asp-action="WaitingRoom">Poczekalnia</a>
+							</li>
+						}
+						@if (User.IsInRole("Administrator"))
+						{
+							<li class="nav-item">
+								<a class="nav-link" asp-controller="Admin" asp-action="Index">Panel administratora</a>
+							</li>
+						}
+					</ul>
+					<partial name="_LoginPartial" />
+				</div>
+			</div>
+		</nav>
+	</header>
+	<div class="container">
+		<main role="main" class="pb-3">
+			@RenderBody()
+		</main>
+	</div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - Blog_Zaliczeniowy - <a asp-area="" asp-controller="Posts" asp-action="Index"></a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+	<footer class="border-top footer text-muted">
+		<div class="container">
+			&copy; 2025 - Blog_Zaliczeniowy - <a asp-area="" asp-controller="Posts" asp-action="Index"></a>
+		</div>
+	</footer>
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -1,9 +1,11 @@
 ﻿@model Blog_Zaliczeniowy.Models.Post
 
+<div class="container" style="word-wrap:break-word">
+
 <h2>@Model.Title</h2>
 <p><strong>Autor:</strong> @Model.User.Nickname</p>
 <p><strong>Data publikacji:</strong> @Model.CreatedAt.ToString("MMMM dd, yyyy")</p>
-<p>@Model.Content</p>
+<p>@Html.Raw(@Model.Content)</p>
 
 <hr />
 
@@ -14,7 +16,6 @@
     <partial name="_CommentPartial.cshtml" for="@comment" />
 }
 
-<!-- Formularz do dodawania nowego komentarza -->
 <h4>Zostaw komentarz:</h4>
 <form asp-action="AddComment" asp-route-postId="@Model.Id" method="post">
     <div class="form-group">
@@ -28,3 +29,4 @@
             <button type="submit" class="btn btn-primary">Wyślij</button>
         }
 </form>
+</div>

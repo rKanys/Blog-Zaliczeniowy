@@ -1,0 +1,58 @@
+﻿@model IEnumerable<Blog_Zaliczeniowy.Models.Post>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+	ViewData["Title"] = "PostoPedia";
+}
+
+<div class="blog-container">
+	<h1 class="page-title">Poczekalnia - po weryfikacji pojawią się na stronie głównej!</h1>
+	<partial name="_SearchAndAddNewBar.cshtml" />
+
+	<partial name="_ShowPostsPartial.cshtml" for="@Model" />
+
+	@if (Model != null && ViewBag.PostsFound > 0)
+	{
+		int currentPage = ViewBag.CurrentPage ?? 1;
+		int totalPages = ViewBag.TotalPages ?? 1;
+		int range = 3;
+
+		Func<int> handleLimits = () => Math.Min(Math.Max(1, totalPages - 2 * range), Math.Max(1, currentPage - range));
+
+		IList<int> pages = Enumerable
+		.Range(handleLimits(), range * 2 + 1)
+		.TakeWhile(p => p <= totalPages)
+		.ToList();
+
+		<div class="MyPagination">
+
+			<a asp-action="WaitingRoom" asp-route-strona="1">Pierwsza</a>
+			@if (currentPage <= 1)
+			{
+
+				<a asp-action="WaitingRoom" id="lastPage" asp-route-strona="@(currentPage)">Poprzednia</a>
+			}
+			else
+			{
+				<a asp-action="WaitingRoom" id="lastPage" asp-route-strona="@(currentPage - 1)">Poprzednia</a>
+			}
+			@foreach (int page in pages)
+			{
+				<a asp-action="WaitingRoom" asp-route-strona="@(page)" class="@(page == currentPage ? "active" : "")">@(page)</a>
+			}
+
+			@if (currentPage == totalPages)
+			{
+
+				<a asp-action="WaitingRoom" id="lastPage" asp-route-strona="@(currentPage)">Następna</a>
+			}
+			else
+			{
+				<a asp-action="WaitingRoom" id="lastPage" asp-route-strona="@(currentPage + 1)">Następna</a>
+			}
+			<a asp-action="WaitingRoom" asp-route-strona="@totalPages">Ostatnia</a>
+
+		</div>
+	}
+</div>

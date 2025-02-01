@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<Blog_Zaliczeniowy.Models.Post>
 @using Microsoft.AspNetCore.Identity
+@using System.Web
 @inject UserManager<ApplicationUser> UserManager
 
 @if (Model != null && ViewBag.PostsFound > 0)
@@ -8,7 +9,6 @@
 	{
 
 		<div class="post-card">
-			<!-- Tytuł posta, klikalny do szczegółów -->
 			<table style="width: 100%;">
 				<tr>
 					<th>
@@ -21,6 +21,10 @@
 						<th style="text-align: right">
 
 							<div class="post-actions">
+								@if (ViewBag.WaitingRoom == true && User.IsInRole("Administrator"))
+								{
+									<a asp-action="Approve" asp-route-id="@item.Id" class="action-btn action-success">Zaakceptuj</a>
+								}
 								<a asp-action="Edit" asp-route-id="@item.Id" class="action-btn">Edytuj</a>
 								<a asp-action="Delete" asp-route-id="@item.Id" class="action-btn action-delete">Usuń</a>
 							</div>
@@ -30,26 +34,18 @@
 			</table>
 
 
-			<!-- Autor i data publikacji -->
+
 			<div class="post-meta">
 				Autor: @item.User?.Nickname
 				| Data publikacji: @item.CreatedAt.ToString("dd MMM yyyy, HH:mm")
 			</div>
 
-			<!-- Treść posta -->
-			@if (item.Content != null && item.Content.Length > 500)
-			{
-				<div class="post-content content-fade">
-					@item.Content.Substring(0, 700)
-				</div>
-				<a asp-action="Details" asp-route-id="@item.Id" class="read-more">Czytaj dalej...</a>
-			}
-			else
-			{
-				<div class="post-content">
-					@item.Content
-				</div>
-			}
+
+			<div class="post-content content-fade">
+				@Html.Raw(@item.Content.Replace("&nbsp;", "").Substring(0, Math.Min(item.Content.Replace("&nbsp;", "").Length, 500)))
+			</div>
+			<a asp-action="Details" asp-route-id="@item.Id" class="read-more">Czytaj dalej...</a>
+
 		</div>
 	}
 }

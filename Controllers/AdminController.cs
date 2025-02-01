@@ -44,10 +44,8 @@ namespace Blog_Zaliczeniowy.Controllers
 			var user = await _userManager.FindByIdAsync(id);
 			if (user == null) return NotFound();
 
-			// Przykładowo – pobieramy role przypisane do użytkownika:
 			var userRoles = await _userManager.GetRolesAsync(user);
 
-			// Tworzymy model widoku:
 			var model = new EditUserViewModel
 			{
 				UserId = user.Id,
@@ -69,7 +67,7 @@ namespace Blog_Zaliczeniowy.Controllers
 			if (user == null) return NotFound();
 
 			user.Nickname = model.Nickname;
-			user.Email = model.Email; // zmieniasz maila, jeśli chcesz
+			user.Email = model.Email;
 
 			var result = await _userManager.UpdateAsync(user);
 			if (!result.Succeeded)
@@ -94,7 +92,6 @@ namespace Blog_Zaliczeniowy.Controllers
 		[HttpGet]
 		public async Task<IActionResult> EditPost(int id)
 		{
-			// Wczytujemy post z bazy danych
 			var post = await _context.Posts
 				.Include(p => p.User)
 				.FirstOrDefaultAsync(p => p.Id == id);
@@ -104,19 +101,17 @@ namespace Blog_Zaliczeniowy.Controllers
 				return NotFound();
 			}
 
-			// Tworzymy ViewModel na podstawie obiektu z bazy
 			var model = new EditPostViewModel
 			{
 				Id = post.Id,
 				Title = post.Title,
 				Content = post.Content,
-				UserId = post.UserId, // tylko jeśli chcesz edytować również autora
+				UserId = post.UserId,
 			};
 
-			// (Opcjonalnie) jeśli chcesz wyświetlić listę użytkowników w dropdownie
 			ViewBag.Users = new SelectList(_context.Users, "Id", "Nickname", post.UserId);
 
-			return View(model); // Przekazujemy model do widoku
+			return View(model);
 		}
 
 		[HttpPost]
@@ -125,27 +120,22 @@ namespace Blog_Zaliczeniowy.Controllers
 		{
 			if (!ModelState.IsValid)
 			{
-				// Jeśli coś nie tak z walidacją, pokaż formularz ponownie
 				return View(model);
 			}
 
-			// Wczytujemy post z bazy
 			var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == model.Id);
 			if (post == null)
 			{
 				return NotFound();
 			}
 
-			// Aktualizujemy dane
 			post.Title = model.Title;
 			post.Content = model.Content;
 			post.UserId = model.UserId;
 
-			// Zapisujemy zmiany w bazie
 			_context.Update(post);
 			await _context.SaveChangesAsync();
 
-			// Przekierowanie do listy postów w panelu admina (lub do szczegółów posta)
 			return RedirectToAction("Posts");
 		}
 
@@ -197,7 +187,6 @@ namespace Blog_Zaliczeniowy.Controllers
 			return RedirectToAction("Comments");
 		}
 
-		// Przykładowa metoda: tworzenie roli
 		[HttpPost]
 		public async Task<IActionResult> CreateRole(string roleName)
 		{
@@ -208,6 +197,18 @@ namespace Blog_Zaliczeniowy.Controllers
 			return RedirectToAction("Roles");
 		}
 
-		// ...
+		[Authorize(Roles = "Administrator")]
+		[HttpGet]
+		public async Task<IActionResult> Approve(int id)
+		{
+			var post = await _context.Posts.FindAsync(id);
+			if (post != null)
+			{
+				post.Approved = true;
+				_context.Posts.Update(post);
+				await _context.SaveChangesAsync();
+			}
+			return RedirectToAction("Posts");
+		}
 	}
 }
