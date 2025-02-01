@@ -42,7 +42,7 @@
 
 
 			<div class="post-content content-fade">
-				@Html.Raw(@item.Content.Replace("&nbsp;", "").Substring(0, Math.Min(item.Content.Replace("&nbsp;", "").Length, 500)))
+				@Html.Raw(@item.Content.Replace("&nbsp;", "").Substring(0, Math.Min(item.Content.Replace("&nbsp;", "").Length, 2000)))
 			</div>
 			<a asp-action="Details" asp-route-id="@item.Id" class="read-more">Czytaj dalej...</a>
 
