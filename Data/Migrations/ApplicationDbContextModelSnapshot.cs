@@ -58,7 +58,7 @@ namespace Blog_Zaliczeniowy.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("Blog_Zaliczeniowy.Models.Post", b =>
@@ -96,7 +96,7 @@ namespace Blog_Zaliczeniowy.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Posts", (string)null);
                 });
 
             modelBuilder.Entity("Blog_Zaliczeniowy.Models.PrivateMessage", b =>
@@ -131,7 +131,7 @@ namespace Blog_Zaliczeniowy.Data.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("PrivateMessages");
+                    b.ToTable("PrivateMessages", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

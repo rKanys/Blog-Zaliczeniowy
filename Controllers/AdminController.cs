@@ -178,13 +178,36 @@ namespace Blog_Zaliczeniowy.Controllers
 		[HttpGet]
 		public async Task<IActionResult> DeleteComment(int id)
 		{
-			var comment = await _context.Comments.FindAsync(id);
-			if (comment != null)
+			var comment = await _context.Comments
+	   .Include(c => c.Replies)
+	   .FirstOrDefaultAsync(c => c.Id == id);
+
+			if (comment == null) return NotFound();
+
+			await DeleteReplies(comment.Replies);
+
+			_context.Comments.Remove(comment);
+			await _context.SaveChangesAsync();
+
+			return RedirectToAction("Index");
+		}
+
+		private async Task DeleteReplies(IEnumerable<Comment> replies)
+		{
+			foreach (var child in replies)
 			{
-				_context.Comments.Remove(comment);
-				await _context.SaveChangesAsync();
+				var deeperChildren = _context.Comments
+					.Include(c => c.Replies)
+					.FirstOrDefault(c => c.Id == child.Id)?.Replies;
+
+				if (deeperChildren != null && deeperChildren.Any())
+				{
+					await DeleteReplies(deeperChildren);
+				}
+
+				_context.Comments.Remove(child);
 			}
-			return RedirectToAction("Comments");
+			await _context.SaveChangesAsync();
 		}
 
 		[HttpPost]
