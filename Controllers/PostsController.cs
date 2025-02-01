@@ -59,7 +59,7 @@ namespace Blog_Zaliczeniowy.Controllers
 				case "search":
 					if (search != null)
 					{
-						postCollectionVariable = posts.Where(p => p.Title.Contains(search) || p.Content.Contains(search));
+						postCollectionVariable = posts.Where(p => p.Title.ToLower().Contains(search.ToLower()) || p.Content.ToLower().Contains(search.ToLower()));
 					}
 					else
 					{

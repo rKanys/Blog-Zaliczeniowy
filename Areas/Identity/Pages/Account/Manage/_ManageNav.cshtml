@@ -1,9 +1,15 @@
 @inject SignInManager<ApplicationUser> SignInManager
+@using Microsoft.AspNetCore.Identity;
+@using System.Security.Claims
+
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }
 <ul class="nav nav-pills flex-column">
-    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">Profile</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">Email</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">Password</a></li>
+    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">Zmieñ nazwê lub numer telefonu</a></li>
+    <li class="nav-item"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">Zmieñ Email</a></li>
+    <li class="nav-item"><a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">Zmieñ has³o</a></li>
+    <li class="nav-item">
+        <a class="nav-link" asp-controller="Profile" asp-action="Index" asp-route-userid="@User.FindFirstValue(ClaimTypes.NameIdentifier)">Zobacz swój profil</a>
+      </li>
 </ul>
