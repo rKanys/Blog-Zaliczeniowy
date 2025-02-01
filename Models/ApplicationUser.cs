@@ -22,5 +22,8 @@ namespace Blog_Zaliczeniowy.Models
 		[Display(Name = "O mnie:")]
 		[StringLength(2000)]
 		public string AboutMe { get; set; }
+
+		[Display(Name = "Status":)]
+		public bool IsDeleted { get; set; } = false; 
 	}
 }

@@ -4,112 +4,133 @@ using Microsoft.EntityFrameworkCore;
 using Blog_Zaliczeniowy.Data;
 using Blog_Zaliczeniowy.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
 
 namespace Blog_Zaliczeniowy.Controllers
 {
-	public class ProfileController : Controller
-	{
-		private readonly UserManager<ApplicationUser> _userManager;
-		private readonly ApplicationDbContext _context;
+    public class ProfileController : Controller
+    {
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ApplicationDbContext _context;
 
-		public ProfileController(UserManager<ApplicationUser> userManager,
-								 ApplicationDbContext context)
-		{
-			_userManager = userManager;
-			_context = context;
-		}
+        public ProfileController(UserManager<ApplicationUser> userManager,
+                                 ApplicationDbContext context)
+        {
+            _userManager = userManager;
+            _context = context;
+        }
 
-		// GET: /Profile/{userId}
-		public async Task<IActionResult> Index(string userId)
-		{
-			if (string.IsNullOrEmpty(userId))
-			{
-				if (User.Identity.IsAuthenticated)
-				{
-					var currentUserId = _userManager.GetUserId(User);
-					return RedirectToAction("Index", new { userId = currentUserId });
-				}
-				else
-				{
-					return RedirectToAction("Login", "Account");
-				}
-			}
+        // GET: /Profile/{userId}
+        public async Task<IActionResult> Index(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                if (User.Identity.IsAuthenticated)
+                {
+                    var currentUserId = _userManager.GetUserId(User);
+                    return RedirectToAction("Index", new { userId = currentUserId });
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+            }
 
-			var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
-			if (user == null) return NotFound();
+            if (user == null) return NotFound();
 
-			var postCount = await _context.Posts.CountAsync(p => p.UserId == user.Id);
+            var postCount = await _context.Posts.CountAsync(p => p.UserId == user.Id);
 
-			var model = new ProfileViewModel
-			{
-				UserId = user.Id,
-				Nickname = user.Nickname,
-				RegistrationDate = user.RegistrationDate,
-				LastLoginDate = user.LastLoginDate,
-				LoginCount = user.LoginCount,
-				PostCount = postCount,
-			};
+            var model = new ProfileViewModel
+            {
+                UserId = user.Id,
+                Nickname = user.Nickname,
+                RegistrationDate = user.RegistrationDate,
+                LastLoginDate = user.LastLoginDate,
+                LoginCount = user.LoginCount,
+                PostCount = postCount,
+            };
 
-			var currentUserId2 = _userManager.GetUserId(User);
-			model.IsOwner = (currentUserId2 == userId);
+            var currentUserId2 = _userManager.GetUserId(User);
+            model.IsOwner = (currentUserId2 == userId);
 
-			return View(model);
-		}
+            return View(model);
+        }
 
+        // GET: /Profile/Edit
+        [HttpGet]
+        public async Task<IActionResult> Edit(string userId)
+        {
+            var currentUserId = _userManager.GetUserId(User);
+            if (userId != currentUserId) return Forbid();
 
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return NotFound();
 
-		// GET: /Profile/Edit
-		[HttpGet]
-		public async Task<IActionResult> Edit(string userId)
-		{
-			var currentUserId = _userManager.GetUserId(User);
-			if (userId != currentUserId) return Forbid();
+            var model = new EditProfileViewModel
+            {
+                UserId = user.Id,
+                Nickname = user.Nickname,
+                AboutMe = user.AboutMe
+            };
+            return View(model);
+        }
 
-			var user = await _userManager.FindByIdAsync(userId);
-			if (user == null) return NotFound();
+        [HttpPost]
+        public async Task<IActionResult> Edit(EditProfileViewModel model)
+        {
+            var currentUserId = _userManager.GetUserId(User);
+            if (model.UserId != currentUserId)
+            {
+                return Forbid();
+            }
 
-			var model = new EditProfileViewModel
-			{
-				UserId = user.Id,
-				Nickname = user.Nickname,
-				AboutMe = user.AboutMe
-			};
-			return View(model);
-		}
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+                return NotFound();
 
-		[HttpPost]
-		public async Task<IActionResult> Edit(EditProfileViewModel model)
-		{
-			var currentUserId = _userManager.GetUserId(User);
-			if (model.UserId != currentUserId)
-			{
-				return Forbid();
-			}
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
 
-			var user = await _userManager.FindByIdAsync(model.UserId);
-			if (user == null)
-				return NotFound();
+            user.Nickname = model.Nickname;
+            user.AboutMe = model.AboutMe;
 
-			if (!ModelState.IsValid)
-			{
-				return View(model);
-			}
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+                return View(model);
+            }
 
-			user.Nickname = model.Nickname;
-			user.AboutMe = model.AboutMe;
+            return RedirectToAction("Index", new { userId = user.Id });
+        }
 
-			var result = await _userManager.UpdateAsync(user);
-			if (!result.Succeeded)
-			{
-				foreach (var error in result.Errors)
-				{
-					ModelState.AddModelError("", error.Description);
-				}
-				return View(model);
-			}
+        // POST: /Profile/Delete
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")] // Restrict to admins only
+        public async Task<IActionResult> Delete(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
 
-			return RedirectToAction("Index", new { userId = user.Id });
-		}
-	}
+            // Soft delete (mark as deleted)
+            user.IsDeleted = true;
+            await _userManager.UpdateAsync(user);
+
+            // OR hard delete (remove from database)
+            // var result = await _userManager.DeleteAsync(user);
+
+            return RedirectToAction("Index", "Home"); // Redirect to home or user list
+        }
+    }
 }
