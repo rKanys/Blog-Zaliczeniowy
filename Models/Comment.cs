@@ -8,7 +8,6 @@ namespace Blog_Zaliczeniowy.Models
 		public int Id { get; set; }
 		[Required]
 		[Display(Name = "Komentarz")]
-		[StringLength(2000)]
 		public string Content { get; set; }
 		public DateTime CreatedAt { get; set; }
 
