@@ -1,0 +1,11 @@
+#ADMINISTRATOR
+admin@admin.com : Admin123#
+
+# UŻYTKOWNICY
+test@admin.com : Admin123#
+test@test.com : Test1234!
+test2@test.com : Test1234!
+test3@test.com : Test1234!
+
+posto@pedia.com : Postopedia123!
+Testowy@owy.com : Testowy@owy.com1
